@@ -1,0 +1,9 @@
+hu\uni\neumann\forexapp\ForexAppApplication.class
+hu\uni\neumann\forexapp\service\MnbParser.class
+hu\uni\neumann\forexapp\controllers\HomeController.class
+hu\uni\neumann\forexapp\config\SoapConfig.class
+hu\uni\neumann\forexapp\controllers\MnbController.class
+hu\uni\neumann\forexapp\service\MnbParser$RatePoint.class
+hu\uni\neumann\forexapp\service\OandaClient.class
+hu\uni\neumann\forexapp\controllers\ForexController.class
+hu\uni\neumann\forexapp\service\MnbService.class
