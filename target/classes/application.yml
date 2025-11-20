@@ -1,0 +1,11 @@
+server:
+  port: 8080
+
+oanda:
+  apiUrl: https://api-fxpractice.oanda.com
+  accountId: 101-004-37680806-001
+  token: 551edb4c42e9b2acf23406ed662dd3ed-17ecdeec1ccc4beff7721e05f6766c09
+
+
+mnb:
+  wsdlUrl: https://www.mnb.hu/arfolyamok.asmx?wsdl

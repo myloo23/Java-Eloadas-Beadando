@@ -1,0 +1,81 @@
+body {
+    background-color: #f5f6fa;
+}
+
+/* Hero rész */
+
+.hero-section {
+    height: 320px;
+    background: radial-gradient(circle at top left, #0d6efd, #031633);
+    color: #fff;
+}
+
+.hero-card {
+    background-color: #f9fafb;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    color: #111827;
+}
+
+.hero-card h2,
+.hero-card p,
+.hero-card li {
+    color: #111827;
+}
+
+
+.bullet-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background-color: #0d6efd;
+    margin-right: 0.5rem;
+}
+
+/* Funkció kártyák */
+
+.feature-card {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 1px solid #e2e6f0;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
+.feature-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0d6efd;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+/* Mini kártyák */
+
+.mini-card {
+    background-color: #ffffff;
+    border-radius: 0.85rem;
+    padding: 1.25rem;
+    border: 1px solid #e2e6f0;
+}
+
+/* Lábléc */
+
+.footer {
+    background-color: #101828;
+    color: #9ca3af;
+}
+

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>MNB SOAP árfolyamok</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="/css/main.css">
+
+    <style>
+        .soap-header {
+            background: linear-gradient(135deg, #0d6efd, #112240);
+            color: white;
+            padding: 2.5rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .soap-card {
+            background: #ffffff;
+            border-radius: 1rem;
+            border: 1px solid #e1e5ed;
+            padding: 1.5rem;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        }
+
+        .chart-box {
+            background: #ffffff;
+            border-radius: 1rem;
+            padding: 1rem;
+            border: 1px solid #e1e5ed;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+        }
+
+        #chart {
+            max-height: 360px;
+        }
+
+        .table thead {
+            background-color: #f1f4f9;
+        }
+
+        .info-badge {
+            background-color: #0d6efd;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">Forex App</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="nav" class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Főoldal</a></li>
+                <li class="nav-item"><a class="nav-link active" href="/soap">SOAP MNB</a></li>
+                <li class="nav-item"><a class="nav-link" href="/forex/account">Forex Account</a></li>
+                <li class="nav-item"><a class="nav-link" href="/forex/price">Forex AktÁr</a></li>
+                <li class="nav-item"><a class="nav-link" href="/forex/hist">Forex HistÁr</a></li>
+                <li class="nav-item"><a class="nav-link" href="/forex/open">Forex Nyit</a></li>
+                <li class="nav-item"><a class="nav-link" href="/forex/positions">Forex Pozíciók</a></li>
+                <li class="nav-item"><a class="nav-link" href="/forex/close">Forex Zár</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<header class="soap-header">
+    <div class="container">
+        <h1 class="display-6 fw-semibold">MNB SOAP árfolyam lekérdezés</h1>
+        <p class="lead mb-0">Dátumtartomány. Deviza. Táblázat. Interaktív grafikon.</p>
+    </div>
+</header>
+
+<main class="container mb-5">
+
+    <div class="soap-card mb-4">
+        <div class="info-badge">DEVIZA TARTOMÁNY LEKÉRDEZÉS</div>
+
+        <form id="q" class="row gy-3 gx-3">
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Deviza</label>
+                <select class="form-select" name="currency" required>
+                    <option value="" disabled selected>Válassz devizát</option>
+                    <option th:each="c : ${currencies}"
+                            th:value="${c}" th:text="${c}"></option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Kezdő dátum</label>
+                <input type="date" class="form-control" name="from" required>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Befejező dátum</label>
+                <input type="date" class="form-control" name="to" required>
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-primary w-100" type="submit">
+                    Lekér
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="soap-card mb-4">
+        <h2 class="h5 mb-3 fw-semibold">Eredmények táblázatban</h2>
+        <div class="table-responsive">
+            <table class="table table-sm table-striped">
+                <thead>
+                <tr>
+                    <th>Dátum</th>
+                    <th>Érték</th>
+                </tr>
+                </thead>
+                <tbody id="rows"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="chart-box">
+        <h2 class="h5 fw-semibold mb-3">Grafikon</h2>
+        <canvas id="chart"></canvas>
+    </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/soap.js"></script>
+</body>
+</html>
