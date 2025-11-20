@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Forex pozíció nyitás</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+
+    <style>
+        .open-header {
+            background: linear-gradient(135deg, #198754, #0b1728);
+            color: white;
+            padding: 2.5rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .card-box {
+            background: #ffffff;
+            border-radius: 1rem;
+            border: 1px solid #e1e5ed;
+            padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border-radius: 0.9rem;
+            border: 1px solid #e1e5ed;
+            padding: 1rem 1.25rem;
+            height: 100%;
+        }
+
+        .stat-label {
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            color: #6b7280;
+            margin-bottom: 0.2rem;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .json-box {
+            background: #0b1020;
+            color: #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            font-family: Consolas, monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            border: 1px solid #1f2937;
+        }
+
+        .json-box code {
+            white-space: pre;
+        }
+
+        .hint-text {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">Forex App</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="nav" class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link " href="/">Főoldal</a></li>
+                <li class="nav-item"><a class="nav-link" href="/soap">SOAP MNB</a></li>
+                <li class="nav-item"><a class="nav-link" href="/forex/account">Forex Account</a></li>
+                <li class="nav-item"><a class="nav-link" href="/forex/price">Forex AktÁr</a></li>
+                <li class="nav-item"><a class="nav-link" href="/forex/hist">Forex HistÁr</a></li>
+                <li class="nav-item"><a class="nav-link active" href="/forex/open">Forex Nyit</a></li>
+                <li class="nav-item"><a class="nav-link" href="/forex/positions">Forex Pozíciók</a></li>
+                <li class="nav-item"><a class="nav-link" href="/forex/close">Forex Zár</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<header class="open-header">
+    <div class="container">
+        <h1 class="display-6 fw-semibold mb-1">Forex pozíció nyitás</h1>
+        <p class="lead mb-0">Instrumentum választása. Mennyiség megadása. Piaci áras nyitás.</p>
+    </div>
+</header>
+
+<main class="container mb-5">
+
+    <!-- Nyitás űrlap -->
+    <div class="card-box mb-4">
+        <h2 class="h5 fw-semibold mb-3">Új pozíció nyitása</h2>
+
+        <form id="openForm" class="row gy-3 gx-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Instrumentum</label>
+                <select class="form-select" name="instrument">
+                    <option th:each="i : ${instruments}"
+                            th:value="${i}" th:text="${i}"></option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Mennyiség</label>
+                <input class="form-control" type="number" name="units" value="1000" required>
+                <div class="hint-text mt-1">
+                    Pozitív érték esetén long. Negatív érték esetén short.
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-success w-100">
+                    Pozíció nyitása
+                </button>
+            </div>
+
+            <div class="col-md-2 text-md-end">
+                <div class="hint-text" id="openStatus">
+                    Még nem történt nyitás.
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Gyors összefoglaló kártyák -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-label">Utolsó instrumentum</div>
+                <div class="stat-value" id="stat-instrument">-</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-label">Mennyiség</div>
+                <div class="stat-value" id="stat-units">-</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-label">Trade ID</div>
+                <div class="stat-value" id="stat-tradeId">-</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JSON doboz -->
+    <div class="card-box">
+        <h2 class="h5 fw-semibold mb-3">OANDA válasz JSON formában</h2>
+        <p class="hint-text mb-2">
+            Itt látható a pozíció nyitásának részletes válasza. A dokumentációhoz hasznos lesz.
+        </p>
+        <div class="json-box">
+            <code id="jsonPretty">{ }</code>
+        </div>
+    </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('openForm');
+        const jsonBox = document.getElementById('jsonPretty');
+        const status = document.getElementById('openStatus');
+
+        const sInstr = document.getElementById('stat-instrument');
+        const sUnits = document.getElementById('stat-units');
+        const sTradeId = document.getElementById('stat-tradeId');
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const data = new FormData(form);
+            const params = new URLSearchParams(data);
+
+            try {
+                const res = await fetch('/forex/open', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json'
+                    },
+                    body: params.toString()
+                });
+
+                const json = await res.json();
+                jsonBox.textContent = JSON.stringify(json, null, 2);
+
+                const instrument = data.get('instrument');
+                const units = data.get('units');
+
+                // OANDA válaszban jellemzően orderFillTransaction vagy orderCreateTransaction van
+                let tradeId = null;
+                if (json.orderFillTransaction && json.orderFillTransaction.id) {
+                    tradeId = json.orderFillTransaction.id;
+                } else if (json.orderCreateTransaction && json.orderCreateTransaction.id) {
+                    tradeId = json.orderCreateTransaction.id;
+                } else if (json.lastTransactionID) {
+                    tradeId = json.lastTransactionID;
+                }
+
+                sInstr.textContent = instrument || "-";
+                sUnits.textContent = units || "-";
+                sTradeId.textContent = tradeId || "-";
+
+                status.textContent = "Utolsó művelet sikeresnek tűnik. Ellenőrizd a pozíciókat a Forex Pozíciók menüben.";
+
+            } catch (err) {
+                console.error(err);
+                jsonBox.textContent = "Hiba történt a kérés feldolgozásakor.";
+                sInstr.textContent = "-";
+                sUnits.textContent = "-";
+                sTradeId.textContent = "-";
+                status.textContent = "Hiba történt a pozíció nyitásakor.";
+            }
+        });
+    });
+</script>
+</body>
+</html>
